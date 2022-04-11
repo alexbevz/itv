@@ -3,7 +3,7 @@ package ru.bevz.itv.dto.mapper;
 import org.springframework.stereotype.Component;
 import ru.bevz.itv.controller.model.ApplicationModel;
 import ru.bevz.itv.dto.ApplicationDto;
-import ru.bevz.itv.entity.Application;
+import ru.bevz.itv.domain.Application;
 
 @Component
 public class ApplicationMapper {
