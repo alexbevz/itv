@@ -10,8 +10,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public String handleAnyException(Exception exception, Model model) {
 
-        String error = exception.getMessage() + "Вас автоматически перенаправит на главную страницу через 5 секунд!";
-        model.addAttribute("error", error);
+        model.addAttribute("error", exception.getMessage());
 
         return "error";
     }
