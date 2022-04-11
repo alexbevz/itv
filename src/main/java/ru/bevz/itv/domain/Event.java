@@ -1,19 +1,15 @@
-package ru.bevz.itv.entity;
+package ru.bevz.itv.domain;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
-@RequiredArgsConstructor
-@Accessors(chain = true)
+@NoArgsConstructor
 @Entity
 @Table(name = "\"event\"")
 public class Event {
@@ -21,11 +17,7 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
-    @Column(name = "name")
     private String name;
-
-    @Column(name = "description")
     private String description;
 
     @ManyToOne
@@ -34,5 +26,12 @@ public class Event {
 
     @Column(name = "dt_creation")
     private LocalDateTime dtCreation;
+
+    public Event(String name, String description, Application application, LocalDateTime dtCreation) {
+        this.name = name;
+        this.description = description;
+        this.application = application;
+        this.dtCreation = dtCreation;
+    }
 
 }
