@@ -1,25 +1,25 @@
 package ru.bevz.itv.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import ru.bevz.itv.controller.model.EventModel;
 import ru.bevz.itv.dto.EventDto;
-import ru.bevz.itv.service.ApplicationService;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import ru.bevz.itv.dto.mapper.EventMapper;
+import ru.bevz.itv.service.EventService;
 
 @Controller
-@RequestMapping("/")
 public class MainController {
 
-    @Autowired
-    private ApplicationService applicationService;
+    private final EventMapper eventMapper;
+    private final EventService eventService;
+
+    public MainController(EventService applicationService, EventMapper eventMapper) {
+        this.eventService = applicationService;
+        this.eventMapper = eventMapper;
+    }
 
     @ModelAttribute("event")
     public EventModel getEventModel() {
@@ -27,50 +27,22 @@ public class MainController {
     }
 
     @GetMapping
-    public String root() {
+    public String main() {
         return "index";
     }
 
-    @GetMapping("login")
-    public String login(Model model, HttpServletRequest request) {
-
-        model.addAttribute(
-                "errorLogin", request.isUserInRole("ROLE_USER")
-        );
-
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
-        return "login";
+    @GetMapping("/event")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public String getEventView(@ModelAttribute("event") EventModel eventModel) {
+        return "event";
     }
 
-    @GetMapping("event")
-    public ResponseEntity<Object> addEvent(
-            @RequestParam int idApplication,
-            @RequestParam String nameEvent,
-            @RequestParam String description
-    ) {
-        EventDto eventDto = new EventDto()
-                .setIdApplication(idApplication)
-                .setName(nameEvent)
-                .setDescription(description);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/event")
+    public String addEvent(@ModelAttribute("event") EventModel eventModel) {
+        //TODO: to need to add some handler
+        EventDto eventDto = eventService.addEvent(eventMapper.toEventDto(eventModel));
 
-        applicationService.addEvent(eventDto);
-
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping("event")
-    public ResponseEntity<Object> addEvent(
-            @ModelAttribute("event") EventModel eventModel
-    ) {
-
-        applicationService.addEvent(
-                new EventDto()
-                        .setIdApplication(eventModel.getIdApplication())
-                        .setName(eventModel.getName())
-                        .setDescription(eventModel.getDescription())
-        );
-
-        return ResponseEntity.accepted().build();
+        return "redirect:/event";
     }
 }

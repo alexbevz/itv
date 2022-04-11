@@ -1,6 +1,6 @@
 package ru.bevz.itv.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -8,33 +8,46 @@ import org.springframework.web.bind.annotation.*;
 import ru.bevz.itv.controller.model.ApplicationModel;
 import ru.bevz.itv.dto.ApplicationDto;
 import ru.bevz.itv.dto.mapper.ApplicationMapper;
+import ru.bevz.itv.domain.Application;
+import ru.bevz.itv.domain.User;
 import ru.bevz.itv.service.ApplicationService;
 
 @Controller
 @RequestMapping("/user")
 public class UserApplicationController {
 
-    @Autowired
-    private ApplicationService applicationService;
+    private final ApplicationService applicationService;
 
-    @Autowired
-    private ApplicationMapper applicationMapper;
+    private final ApplicationMapper applicationMapper;
+
+    public UserApplicationController(ApplicationService applicationService, ApplicationMapper applicationMapper) {
+        this.applicationService = applicationService;
+        this.applicationMapper = applicationMapper;
+    }
 
     @GetMapping("/applications")
-    public String getListApplications(Model model) {
-        model.addAttribute("applications", applicationService.getApplicationsByCurrentUser());
+    public String getListApplications(
+            @AuthenticationPrincipal User user,
+            Model model
+    ) {
+        model.addAttribute("applications", applicationService.getApplicationsByUser(user));
         return "/user/applications";
     }
 
     @GetMapping("/applications/add")
-    public String addApplication(Model model) {
-        ApplicationDto applicationDto = applicationService.preAddApplicationForCurrentUser();
-        model.addAttribute("app", applicationMapper.toApplicationModel(applicationDto));
-        return "/user/add-app";
+    public String getFormForAddApplication(
+            @AuthenticationPrincipal User user,
+            Model model
+    ) {
+        ApplicationDto applicationDto = applicationService.preAddApplicationForUser(user);
+        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
+
+        return "/user/applicationAdd";
     }
 
-    @PostMapping("/applications/add")
+    @PostMapping("/applications")
     public String addApplication(
+            @AuthenticationPrincipal User user,
             @ModelAttribute("application") ApplicationModel applicationModel,
             BindingResult result
     ) {
@@ -43,27 +56,29 @@ public class UserApplicationController {
         }
 
         if (result.hasErrors()) {
-            return "/user/add-app";
+            return "/user/applicationAdd";
         }
 
-        applicationService.addApplicationForCurrentUser(
-                new ApplicationDto()
-                        .setId(applicationModel.getId())
-                        .setName(applicationModel.getName())
-        );
+        ApplicationDto applicationDto = new ApplicationDto();
+        applicationDto.setId(applicationModel.getId());
+        applicationDto.setName(applicationModel.getName());
+
+        applicationDto = applicationService.addApplicationForUser(applicationDto, user);
 
 
         return "redirect:/user/applications";
     }
 
-    @GetMapping("/applications/{id}")
+    @GetMapping("/applications/{application}")
     public String detailApplication(
-            @PathVariable long id,
+            @AuthenticationPrincipal User user,
+            @PathVariable Application application,
             Model model
     ) {
-        ApplicationDto applicationDto = applicationService.getApplicationByCurrentUser(id);
-        model.addAttribute("app", applicationMapper.toApplicationModel(applicationDto));
+        ApplicationDto applicationDto =
+                applicationService.getApplicationByIdAndUser(application.getId(), user);
+        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
 
-        return "/user/app-detail";
+        return "/user/applicationDetail";
     }
 }
