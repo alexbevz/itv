@@ -1,19 +1,18 @@
 package ru.bevz.itv.service;
 
 import ru.bevz.itv.dto.ApplicationDto;
-import ru.bevz.itv.dto.EventDto;
+import ru.bevz.itv.domain.User;
 
 import java.util.List;
 
 public interface ApplicationService {
 
-    ApplicationDto addApplicationForCurrentUser(ApplicationDto applicationDto);
+    ApplicationDto addApplicationForUser(ApplicationDto applicationDto, User user);
 
-    ApplicationDto preAddApplicationForCurrentUser();
+    ApplicationDto preAddApplicationForUser(User user);
 
-    List<ApplicationDto> getApplicationsByCurrentUser();
+    List<ApplicationDto> getApplicationsByUser(User user);
 
-    ApplicationDto getApplicationByCurrentUser(long idApplication);
+    ApplicationDto getApplicationByIdAndUser(long idApplication, User user);
 
-    EventDto addEvent(EventDto eventDto);
 }

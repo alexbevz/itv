@@ -1,20 +1,13 @@
 package ru.bevz.itv.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.bevz.itv.dto.ApplicationDto;
-import ru.bevz.itv.dto.EventDto;
 import ru.bevz.itv.dto.mapper.ApplicationMapper;
-import ru.bevz.itv.dto.mapper.EventMapper;
-import ru.bevz.itv.entity.Application;
-import ru.bevz.itv.entity.Event;
-import ru.bevz.itv.entity.User;
+import ru.bevz.itv.domain.Application;
+import ru.bevz.itv.domain.User;
 import ru.bevz.itv.repository.ApplicationRepository;
-import ru.bevz.itv.repository.EventRepository;
-import ru.bevz.itv.repository.UserRepository;
 
-import javax.persistence.EntityExistsException;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,25 +18,16 @@ import java.util.stream.Collectors;
 public class ApplicationServiceImpl implements ApplicationService {
 
     @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
     private ApplicationRepository applicationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private EventMapper eventMapper;
 
     @Autowired
     private ApplicationMapper applicationMapper;
 
     @Override
-    public ApplicationDto addApplicationForCurrentUser(ApplicationDto applicationDto) {
+    public ApplicationDto addApplicationForUser(ApplicationDto applicationDto, User user) {
         final String nameApplication = applicationDto.getName();
         if (nameApplication.isEmpty()) {
-            throw new NullPointerException("Не задано название приложения!");
+            throw new ValidationException("Не задано название приложения!");
         }
 
         final long idApplication = applicationDto.getId();
@@ -52,10 +36,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         Application application;
-        User user = getCurrentUser();
 
         if (idApplication == 0) {
-            application = new Application().setUser(user);
+            application = new Application();
+            application.setUser(user);
         } else {
             Optional<Application> applicationOptional =
                     applicationRepository.findApplicationByIdAndUser(idApplication, user);
@@ -66,31 +50,41 @@ public class ApplicationServiceImpl implements ApplicationService {
             }
         }
 
-        application
-                .setName(nameApplication)
-                .setDtCreation(LocalDateTime.now());
+        application.setName(nameApplication);
+        application.setDtCreation(LocalDateTime.now());
 
         application = applicationRepository.save(application);
 
         return applicationMapper.toApplicationDto(application);
     }
 
+    // Так как по условию сказано, что
+    // "Форма создания приложения должна содержать следующее поле:
+    //  ● уникальный идентификатор приложения;",
+    // следовательно, приложение следует создать до того,
+    // как будет отправлена форма создания приложения.
+    // Также следует рассмотреть вариант,
+    // что пользователь выполняет опять get-запрос для создания формы.
+    // Но так как в БД уже есть созданное приложение без названия, то следует его, а не новое генерировать.
     @Override
-    public ApplicationDto preAddApplicationForCurrentUser() {
+    public ApplicationDto preAddApplicationForUser(User user) {
+        // Ищем приложение без название (name = null) у текущего пользователя в БД.
         Optional<Application> optionalApplication =
-                applicationRepository.findApplicationByUserAndName(getCurrentUser(), null);
+                applicationRepository.findApplicationByUserAndNameIsNull(user);
 
+        // Если нашлось такое приложение, то возвращаем как черновик.
         if (optionalApplication.isPresent()) {
             return applicationMapper.toApplicationDto(optionalApplication.get());
         }
-        return applicationMapper.toApplicationDto(
-                applicationRepository.save(new Application().setUser(getCurrentUser()))
-        );
+
+        // Иначе создаем и возвращаем приложение у текущего пользователя.
+        Application application = new Application();
+        application.setUser(user);
+        return applicationMapper.toApplicationDto(applicationRepository.save(application));
     }
 
     @Override
-    public List<ApplicationDto> getApplicationsByCurrentUser() {
-        User user = getCurrentUser();
+    public List<ApplicationDto> getApplicationsByUser(User user) {
 
         List<Application> applicationList =
                 applicationRepository.getApplicationsByUserAndNameIsNotNullOrderByDtCreation(user);
@@ -101,50 +95,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationDto getApplicationByCurrentUser(long idApplication) {
-        User user = getCurrentUser();
-
-        Optional<Application> application =
+    public ApplicationDto getApplicationByIdAndUser(long idApplication, User user) {
+        Application application =
                 applicationRepository.findApplicationByIdAndUserAndNameIsNotNull(idApplication, user);
 
-        if (application.isEmpty()) {
+        if (application == null) {
             throw new NullPointerException("Приложение с уникальным идентификатором "
                     + idApplication +
                     " не сущестует или принадлежит другому пользователю!");
         }
 
-        return applicationMapper.toApplicationDto(application.get());
-    }
-
-    @Override
-    public EventDto addEvent(EventDto eventDto) {
-        long applicationId = eventDto.getIdApplication();
-
-        Optional<Application> applicationOptional = applicationRepository.findById(applicationId);
-        if (applicationOptional.isEmpty()) {
-            throw new EntityExistsException("Not exists application with id = " + applicationId);
-        }
-
-        Event event = new Event()
-                .setApplication(applicationOptional.get())
-                .setName(eventDto.getName())
-                .setDescription(eventDto.getDescription())
-                .setDtCreation(LocalDateTime.now());
-
-        event = eventRepository.save(event);
-
-        return eventMapper.toEventDto(event);
-    }
-
-    private User getCurrentUser() {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        Optional<User> userOptional = userRepository.findByEmail(userEmail);
-
-        if (userOptional.isEmpty()) {
-            throw new EntityExistsException("Пользователя с email " + userEmail + " не существует!");
-        }
-        return userOptional.get();
+        return applicationMapper.toApplicationDto(application);
     }
 
 }
