@@ -7,7 +7,7 @@ import ru.bevz.itv.domain.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface ApplicationRepository extends JpaRepository<Application, Long> {
+public interface ApplicationRepo extends JpaRepository<Application, Long> {
 
     Optional<Application> findApplicationByIdAndUser(long id, User user);
 

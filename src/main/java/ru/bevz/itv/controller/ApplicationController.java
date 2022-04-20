@@ -6,23 +6,18 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.bevz.itv.controller.model.ApplicationModel;
-import ru.bevz.itv.dto.ApplicationDto;
-import ru.bevz.itv.dto.mapper.ApplicationMapper;
 import ru.bevz.itv.domain.Application;
 import ru.bevz.itv.domain.User;
 import ru.bevz.itv.service.ApplicationService;
 
 @Controller
 @RequestMapping("/user")
-public class UserApplicationController {
+public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    private final ApplicationMapper applicationMapper;
-
-    public UserApplicationController(ApplicationService applicationService, ApplicationMapper applicationMapper) {
+    public ApplicationController(ApplicationService applicationService) {
         this.applicationService = applicationService;
-        this.applicationMapper = applicationMapper;
     }
 
     @GetMapping("/applications")
@@ -30,7 +25,7 @@ public class UserApplicationController {
             @AuthenticationPrincipal User user,
             Model model
     ) {
-        model.addAttribute("applications", applicationService.getApplicationsByUser(user));
+//        model.addAttribute("applications", applicationService.getApplicationsByUser(user));
         return "/user/applications";
     }
 
@@ -39,8 +34,8 @@ public class UserApplicationController {
             @AuthenticationPrincipal User user,
             Model model
     ) {
-        ApplicationDto applicationDto = applicationService.preAddApplicationForUser(user);
-        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
+//        ApplicationDto applicationDto = applicationService.preAddApplicationForUser(user);
+//        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
 
         return "/user/applicationAdd";
     }
@@ -59,11 +54,11 @@ public class UserApplicationController {
             return "/user/applicationAdd";
         }
 
-        ApplicationDto applicationDto = new ApplicationDto();
-        applicationDto.setId(applicationModel.getId());
-        applicationDto.setName(applicationModel.getName());
-
-        applicationDto = applicationService.addApplicationForUser(applicationDto, user);
+//        ApplicationDto applicationDto = new ApplicationDto();
+//        applicationDto.setId(applicationModel.getId());
+//        applicationDto.setName(applicationModel.getName());
+//
+//        applicationDto = applicationService.addApplicationForUser(applicationDto, user);
 
 
         return "redirect:/user/applications";
@@ -75,9 +70,9 @@ public class UserApplicationController {
             @PathVariable Application application,
             Model model
     ) {
-        ApplicationDto applicationDto =
-                applicationService.getApplicationByIdAndUser(application.getId(), user);
-        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
+//        ApplicationDto applicationDto =
+//                applicationService.getApplicationByIdAndUser(application.getId(), user);
+//        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
 
         return "/user/applicationDetail";
     }
