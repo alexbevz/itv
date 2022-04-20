@@ -1,87 +1,20 @@
-<#macro login>
-    <form action="/login" method="post">
-<#--        <#if param.invalidData>-->
-<#--            <div class="alert alert-danger">-->
-<#--                Ввведена неправильная электронная почта или пароль.-->
-<#--            </div>-->
-<#--        </#if>-->
-<#--        <#if param.logout>-->
-<#--            <div class="alert alert-info">-->
-<#--                Вы успешно разавторизовались.-->
-<#--            </div>-->
-<#--        </#if>-->
-        <div class="form-group">
-            <label>
-                Электронная почта:
-                <input autofocus="autofocus"
-                       class="form-control"
-                       name="username"<#--TODO: to fix if will be a bug-->
-                       placeholder="Электронная почта"
-                       type="email"/>
-            </label>
-        </div>
-        <div class="form-group">
-            <label>
-                Пароль:
-                <input class="form-control"
-                       name="password"
-                       placeholder="Пароль"
-                       type="password"/>
-            </label>
-        </div>
-        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-        <div class="form-group">
-            <input class="form-control btn btn-info"
-                   name="login-submit"
-                   type="submit"
-                   value="Войти"/>
-        </div>
-    </form>
-</#macro>
+<#assign
+known = Session.SPRING_SECURITY_CONTEXT??
+>
 
-<#macro registration>
-    <form action="/registration" method="post">
-        <div class="form-group">
-            <label>
-                Электронная почта:
-                <input autofocus="autofocus"
-                       class="form-control"
-                       name="email"
-                       placeholder="Электронная почта"
-                       type="email"/>
-            </label>
-        </div>
-        <div class="form-group">
-            <label>
-                Пароль:
-                <input class="form-control"
-                       name="password"
-                       placeholder="Пароль"
-                       type="password"/>
-            </label>
-        </div>
-        <div class="form-group">
-            <label>
-                Подтверждение пароля:
-                <input class="form-control"
-                       name="confirmPassword"
-                       placeholder="Подтверждение пароля"
-                       type="password"/>
-            </label>
-        </div>
-        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-        <div class="form-group">
-            <input class="form-control btn btn-info"
-                   name="login-submit"
-                   type="submit"
-                   value="Зарегистрироваться"/>
-        </div>
-    </form>
-</#macro>
+<#if known>
+    <#assign
+    user = Session.SPRING_SECURITY_CONTEXT.authentication.principal
+    name = user.getUsername()
+    isAdmin = user.isAdmin()
+    currentUserId = user.getId()
+    >
+<#else>
+    <#assign
+    name = "anonymous"
+    isAdmin = false
+    currentUserId = -1
+    >
+</#if>
 
-<#macro logout>
-    <form action="/logout" method="post">
-        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-        <input type="submit" value="Выйти"/>
-    </form>
-</#macro>
+<#assign captchaKey = "6LcdKH8fAAAAAA6cYNNJHDOtEKsPTJSV6fConIPb" >
