@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
@@ -13,13 +13,13 @@ import javax.validation.constraints.NotBlank;
 @ToString
 public class EventModel {
 
-    @NotBlank
+    @NotEmpty(message = "уникальный индентификатор приложения не может быть пустым")
     private long idApplication;
 
-    @NotBlank
+    @NotEmpty(message = "название события не может быть пустым")
     private String name;
 
-    @NotBlank
+    @NotEmpty(message = "описание события не может быть пустым")
     private String description;
 
 }

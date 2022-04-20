@@ -15,9 +15,10 @@ import javax.validation.constraints.NotEmpty;
 @Accessors(chain = true)
 public class ApplicationModel {
 
+    @NotEmpty(message = "уникальный индентификатор приложения не может быть пустым")
     private long id;
 
-    @NotEmpty
+    @NotEmpty(message = "название приложения не может быть пустым")
     private String name;
 
 }
