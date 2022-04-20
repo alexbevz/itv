@@ -20,9 +20,9 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotBlank(message = "username can not be empty")
+    @NotBlank(message = "электронная почта не может быть пустой")
     private String username;
-    @NotBlank(message = "password can not be empty")
+    @NotBlank(message = "пароль не может быть пустой")
     private String password;
 
     @Transient

@@ -25,17 +25,9 @@ public class RegistrationController {
     @Value("${recaptcha.secret}")
     private String recaptchaSecret;
 
-    @Value("${recaptcha.html}")
-    private String recaptchaHtml;
-
     public RegistrationController(UserService userService, RestTemplate restTemplate) {
         this.userService = userService;
         this.restTemplate = restTemplate;
-    }
-
-    @ModelAttribute(name = "recaptchaKey")
-    private String getRecaptchaHtml() {
-        return recaptchaHtml;
     }
 
     @GetMapping("/registration")
@@ -57,15 +49,15 @@ public class RegistrationController {
 
         if (response != null && !response.isSuccess()) {
             //TODO: to need to implement by BindingResult
-            model.addAttribute("captchaError", "fill captcha");
+            model.addAttribute("captchaError", "заполните каптчу");
         }
 
         if (user.getPassword() != null && !user.getConfirmPassword().equals(user.getPassword())) {
-            result.rejectValue("confirmPassword", "confirmPasswordError", "passwords are different");
+            result.rejectValue("confirmPassword", "confirmPasswordError", "пароли разные");
         }
 
         if (userService.findByUsername(user.getUsername()) != null) {
-            result.rejectValue("username", "usernameError", "user exists");
+            result.rejectValue("username", "usernameError", "пользователь с такой почтой существует");
         }
 
         if (result.hasErrors() || (response != null && !response.isSuccess())) {
