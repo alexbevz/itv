@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler
-    public String handleAnyException(Exception exception, Model model) {
+    public String handleAnyException(
+            Exception exception,
+            Model model
+    ) {
 
-        model.addAttribute("error", exception.getMessage());
+        model.addAttribute("infoError", exception.getMessage());
 
         return "error";
     }
-
 }

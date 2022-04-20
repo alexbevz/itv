@@ -1,9 +1,22 @@
 package ru.bevz.itv.service;
 
-import ru.bevz.itv.dto.EventDto;
+import org.springframework.stereotype.Service;
+import ru.bevz.itv.domain.Event;
+import ru.bevz.itv.repository.EventRepo;
 
-public interface EventService {
+import java.time.LocalDateTime;
 
-    EventDto addEvent(EventDto eventDto);
+@Service
+public class EventService {
 
+    private final EventRepo eventRepo;
+
+    public EventService(EventRepo eventRepo) {
+        this.eventRepo = eventRepo;
+    }
+
+    public void addEvent(Event event) {
+        event.setDtCreation(LocalDateTime.now());
+        eventRepo.save(event);
+    }
 }
