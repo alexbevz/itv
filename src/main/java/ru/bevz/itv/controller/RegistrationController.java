@@ -5,29 +5,44 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.bevz.itv.domain.User;
-import ru.bevz.itv.domain.dto.CaptchaResponseDto;
 import ru.bevz.itv.service.UserService;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Collections;
+
 
 @Controller
 public class RegistrationController {
 
-    private final static String CAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
-
     private final UserService userService;
 
-    private final RestTemplate restTemplate;
+    private final ControllerUtils controllerUtils;
 
-    @Value("${recaptcha.secret}")
-    private String recaptchaSecret;
+    @Value("${recaptcha.html}")
+    private String captchaHtml;
 
-    public RegistrationController(UserService userService, RestTemplate restTemplate) {
+    public RegistrationController(UserService userService, ControllerUtils controllerUtils) {
         this.userService = userService;
-        this.restTemplate = restTemplate;
+        this.controllerUtils = controllerUtils;
+    }
+
+    @ModelAttribute("captchaHtml")
+    public String getCaptchaHtml() {
+        return captchaHtml;
+    }
+
+    @GetMapping("/login")
+    public String getLogin(Model model, HttpSession session) {
+
+        if (session != null && session.getAttribute("SPRING_SECURITY_LAST_EXCEPTION") != null) {
+            model.addAttribute("message", "неверные учетные данные");
+            model.addAttribute("messageType", "danger");
+            session.setAttribute("SPRING_SECURITY_LAST_EXCEPTION", null);
+        }
+
+        return "login";
     }
 
     @GetMapping("/registration")
@@ -40,15 +55,12 @@ public class RegistrationController {
             @RequestParam("g-recaptcha-response") String captchaResponse,
             @Valid User user,
             BindingResult result,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
-        String url = String.format(CAPTCHA_URL, recaptchaSecret, captchaResponse);
+        boolean validCaptcha = controllerUtils.checkCaptcha(captchaResponse);
 
-        CaptchaResponseDto response =
-                restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponseDto.class);
-
-        if (response != null && !response.isSuccess()) {
-            //TODO: to need to implement by BindingResult
+        if (!validCaptcha) {
             model.addAttribute("captchaError", "заполните каптчу");
         }
 
@@ -60,28 +72,38 @@ public class RegistrationController {
             result.rejectValue("username", "usernameError", "пользователь с такой почтой существует");
         }
 
-        if (result.hasErrors() || (response != null && !response.isSuccess())) {
-            model.mergeAttributes(ControllerUtils.getErrors(result));
+        if (result.hasErrors() || !validCaptcha) {
+            model.mergeAttributes(controllerUtils.getErrors(result));
             return "registration";
         }
 
         userService.addUser(user);
+        redirectAttributes.addFlashAttribute("message", "Пользователь успешно зарегистрирован! Подтвердите почту, перейдя по ссылке в письме");
+        redirectAttributes.addFlashAttribute("messageType", "success");
 
         return "redirect:/login";
     }
 
     @GetMapping("/activate/{code}")
-    public String activate(Model model, @PathVariable String code) {
+    public String activate(
+            @PathVariable String code,
+            RedirectAttributes redirectAttributes
+    ) {
         boolean isActivate = userService.activateUser(code);
+        String message;
+        String messageType;
 
         if (isActivate) {
-            model.addAttribute("message", "User successfully activated!");
-            model.addAttribute("messageType", "success");
+            message = "Пользователь успешно подтвержден!";
+            messageType = "success";
         } else {
-            model.addAttribute("message", "Activate code is not found!");
-            model.addAttribute("messageType", "danger");
+            message = "Код активации не найден!";
+            messageType = "danger";
         }
+        redirectAttributes.addFlashAttribute("message", message);
+        redirectAttributes.addFlashAttribute("messageType", messageType);
 
-        return "login";
+        return "redirect:/login";
     }
+
 }
