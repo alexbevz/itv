@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -65,10 +66,8 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         User user = (User) o;
-
-        return id.equals(user.id);
+        return Objects.equals(id, user.id);
     }
 
     @Override
