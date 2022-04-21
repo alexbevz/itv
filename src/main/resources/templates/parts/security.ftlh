@@ -1,6 +1,4 @@
-<#assign
-known = Session.SPRING_SECURITY_CONTEXT??
->
+<#assign known = Session.SPRING_SECURITY_CONTEXT??>
 
 <#if known>
     <#assign
@@ -17,4 +15,6 @@ known = Session.SPRING_SECURITY_CONTEXT??
     >
 </#if>
 
-<#assign captchaKey = "6LcdKH8fAAAAAA6cYNNJHDOtEKsPTJSV6fConIPb" >
+<#if captchaHtml??>
+    <#assign captchaKey = captchaHtml>
+</#if>
