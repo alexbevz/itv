@@ -7,19 +7,21 @@
             <h1>Мои приложения</h1>
 
             <ol class="list-group">
-                <#list applications as app>
-                    <li class="list-group-item">
-                        <a href="/user/applications/${app.id}">
-                            Приложение ${app.name}
-                        </a>
-                    </li>
-                    <#else>
-                        <strong>Нет добавленных приложений!</strong>
+                <#list apps as app>
+                    <div class="mb-3 sb-3">
+                        <li class="list-group-item ">
+                            <a href="/user/applications/${app.id}">
+                                Приложение ${app.name}
+                            </a>
+                        </li>
+                    </div>
+                <#else>
+                    <strong class="mb-3 sb-3">Нет добавленных приложений!</strong>
                 </#list>
             </ol>
-            <div class="form-group">
+            <div class="form-group mb-3 sb-3">
                 <a href="/user/applications/add">
-                    <button class="btn">Добавить новое приложение</button>
+                    <button class="btn btn-primary">Добавить новое приложение</button>
                 </a>
             </div>
         </div>
