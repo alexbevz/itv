@@ -4,9 +4,11 @@ package ru.bevz.itv.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -27,8 +29,16 @@ public class Application {
     @Column(name = "dt_creation")
     private LocalDateTime dtCreation;
 
-    public Application(long id) {
-        this.id = id;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Application that = (Application) o;
+        return Objects.equals(id, that.id);
     }
 
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
