@@ -3,9 +3,7 @@ package ru.bevz.itv.controller;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.bevz.itv.controller.model.ApplicationModel;
 import ru.bevz.itv.domain.Application;
 import ru.bevz.itv.domain.User;
 import ru.bevz.itv.service.ApplicationService;
@@ -14,10 +12,10 @@ import ru.bevz.itv.service.ApplicationService;
 @RequestMapping("/user")
 public class ApplicationController {
 
-    private final ApplicationService applicationService;
+    private final ApplicationService appServ;
 
-    public ApplicationController(ApplicationService applicationService) {
-        this.applicationService = applicationService;
+    public ApplicationController(ApplicationService appServ) {
+        this.appServ = appServ;
     }
 
     @GetMapping("/applications")
@@ -25,7 +23,7 @@ public class ApplicationController {
             @AuthenticationPrincipal User user,
             Model model
     ) {
-//        model.addAttribute("applications", applicationService.getApplicationsByUser(user));
+        model.addAttribute("apps", appServ.getByUser(user));
         return "/user/applications";
     }
 
@@ -34,8 +32,8 @@ public class ApplicationController {
             @AuthenticationPrincipal User user,
             Model model
     ) {
-//        ApplicationDto applicationDto = applicationService.preAddApplicationForUser(user);
-//        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
+
+        model.addAttribute("app", appServ.preAddApplicationForUser(user));
 
         return "/user/applicationAdd";
     }
@@ -43,36 +41,30 @@ public class ApplicationController {
     @PostMapping("/applications")
     public String addApplication(
             @AuthenticationPrincipal User user,
-            @ModelAttribute("application") ApplicationModel applicationModel,
-            BindingResult result
+            @RequestParam String name,
+            Model model
     ) {
-        if (applicationModel.getName().isEmpty()) {
-            result.rejectValue("name", null, "Пустое приложение, задайте название!");
-        }
 
-        if (result.hasErrors()) {
+        if (name == null || name.isEmpty()) {
+            model.addAttribute("nameError", "название приложения не может быть пустым");
             return "/user/applicationAdd";
         }
 
-//        ApplicationDto applicationDto = new ApplicationDto();
-//        applicationDto.setId(applicationModel.getId());
-//        applicationDto.setName(applicationModel.getName());
-//
-//        applicationDto = applicationService.addApplicationForUser(applicationDto, user);
-
+        Application app = new Application();
+        app.setName(name);
+        appServ.addApplicationForUser(app, user);
 
         return "redirect:/user/applications";
     }
 
-    @GetMapping("/applications/{application}")
+    @GetMapping("/applications/{app}")
     public String detailApplication(
             @AuthenticationPrincipal User user,
-            @PathVariable Application application,
+            @PathVariable Application app,
             Model model
     ) {
-//        ApplicationDto applicationDto =
-//                applicationService.getApplicationByIdAndUser(application.getId(), user);
-//        model.addAttribute("application", applicationMapper.toApplicationModel(applicationDto));
+
+        model.addAttribute("app", app);
 
         return "/user/applicationDetail";
     }
