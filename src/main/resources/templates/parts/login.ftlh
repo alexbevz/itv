@@ -39,23 +39,24 @@
                     </div>
                 </#if>
             </div>
-        </#if>
-<#--        <#include "security.ftlh">-->
-<#--        <div class="g-recaptcha sb-3" data-sitekey="${captchaKey}"></div>-->
-        <div class="g-recaptcha sb-3" data-sitekey="6LcdKH8fAAAAAA6cYNNJHDOtEKsPTJSV6fConIPb"></div>
-        <#if captchaError??>
-            <div class="alert alert-danger" role="alert">
-                ${captchaError}
+            <div class="mb-3 sb-3">
+                <#include "security.ftlh">
+                <div class="g-recaptcha sb-3" data-sitekey="${captchaKey}"></div>
+                <#if captchaError??>
+                    <div class="alert alert-danger" role="alert">
+                        ${captchaError}
+                    </div>
+                </#if>
             </div>
         </#if>
-        <div>
+        <div class="mb-3 sb-3">
             <#if !isRegisterForm>
-                <div class="sb-3">
+                <div class="mb-3 sb-3">
                     <button class="btn btn-primary" type="submit">Войти</button>
                 </div>
                 <a href="/registration">Зарегистрироваться</a>
             <#else>
-                <div class="sb-3">
+                <div class="mb-3 sb-3">
                     <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
                 </div>
                 <a href="/login">Войти</a>
@@ -70,4 +71,3 @@
         <button class="btn btn-primary" type="submit">Выйти</button>
     </form>
 </#macro>
-
