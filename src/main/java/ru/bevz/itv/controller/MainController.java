@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import ru.bevz.itv.controller.model.EventModel;
 import ru.bevz.itv.domain.Event;
 import ru.bevz.itv.service.EventService;
 
@@ -18,11 +17,6 @@ public class MainController {
         this.eventService = applicationService;
     }
 
-    @ModelAttribute("event")
-    public EventModel getEventModel() {
-        return new EventModel();
-    }
-
     @GetMapping("/")
     public String main() {
         return "index";
@@ -30,15 +24,15 @@ public class MainController {
 
     @GetMapping("/event")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String getEventView(@ModelAttribute("event") EventModel eventModel) {
+    public String getEventView() {
         return "event";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/event")
-    public String addEvent(@ModelAttribute("event") EventModel eventModel) {
-        //TODO: to need to add some handler
-        eventService.addEvent(new Event());
+    public String addEvent(@ModelAttribute("event") Event event) {
+
+        eventService.addEvent(event);
 
         return "redirect:/event";
     }
