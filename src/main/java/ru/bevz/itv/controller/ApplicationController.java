@@ -8,6 +8,9 @@ import ru.bevz.itv.domain.Application;
 import ru.bevz.itv.domain.User;
 import ru.bevz.itv.service.ApplicationService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Controller
 @RequestMapping("/user")
 public class ApplicationController {
@@ -59,12 +62,27 @@ public class ApplicationController {
 
     @GetMapping("/applications/{app}")
     public String detailApplication(
-            @AuthenticationPrincipal User user,
             @PathVariable Application app,
+            @RequestParam(value = "timeFrom", required = false) String timeFromStr,
+            @RequestParam(value = "timeTo", required = false) String timeToStr,
             Model model
     ) {
+        LocalDateTime timeFrom;
+        LocalDateTime timeTo;
 
+        // TODO: to fix later and to add setting time in view
+        if (timeFromStr == null || timeToStr == null) {
+            timeFrom = LocalDateTime.now().minusDays(365);
+            timeTo = LocalDateTime.now();
+        } else {
+            timeFrom = LocalDate.parse(timeFromStr).atStartOfDay();
+            timeTo = LocalDate.parse(timeToStr).atStartOfDay();
+        }
+
+        appServ.generateChart(app, timeFrom, timeTo);
         model.addAttribute("app", app);
+        model.addAttribute("timeFrom", timeFrom);
+        model.addAttribute("timeTo", timeTo);
 
         return "/user/applicationDetail";
     }
