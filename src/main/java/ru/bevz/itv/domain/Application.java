@@ -29,6 +29,8 @@ public class Application {
     @Column(name = "dt_creation")
     private LocalDateTime dtCreation;
 
+    private String chart;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
