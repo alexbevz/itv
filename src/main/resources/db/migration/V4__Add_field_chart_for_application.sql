@@ -1,0 +1,1 @@
+alter table "application" add column chart varchar(255) default null;
