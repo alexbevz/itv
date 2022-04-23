@@ -29,7 +29,11 @@ public class Application {
     @Column(name = "dt_creation")
     private LocalDateTime dtCreation;
 
-    private String chart;
+    @Column(name = "chart")
+    private String filenameChart;
+
+    @Column(name = "csv")
+    private String filenameCsv;
 
     @Override
     public boolean equals(Object o) {
