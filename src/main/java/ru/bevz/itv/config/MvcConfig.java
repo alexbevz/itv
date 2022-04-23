@@ -11,8 +11,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
-    @Value("${path.upload.img}")
+    @Value("${download.path.img}")
     private String pathImg;
+
+    @Value("${download.path.csv}")
+    private String pathCsv;
 
     @Bean
     public RestTemplate getRestTemplate() {
@@ -27,6 +30,8 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/**")
                 .addResourceLocations("file:/" + pathImg + "/");
+        registry.addResourceHandler("/csv/**")
+                .addResourceLocations("file:/" + pathCsv + "/");
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
     }
