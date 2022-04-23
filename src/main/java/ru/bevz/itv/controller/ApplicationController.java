@@ -10,6 +10,7 @@ import ru.bevz.itv.service.ApplicationService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Controller
 @RequestMapping("/user")
@@ -63,26 +64,35 @@ public class ApplicationController {
     @GetMapping("/applications/{app}")
     public String detailApplication(
             @PathVariable Application app,
-            @RequestParam(value = "timeFrom", required = false) String timeFromStr,
-            @RequestParam(value = "timeTo", required = false) String timeToStr,
+            @RequestParam(value = "timeFrom", required = false, defaultValue = "") String timeFromStr,
+            @RequestParam(value = "timeTo", required = false, defaultValue = "") String timeToStr,
             Model model
     ) {
         LocalDateTime timeFrom;
         LocalDateTime timeTo;
 
-        // TODO: to fix later and to add setting time in view
-        if (timeFromStr == null || timeToStr == null) {
-            timeFrom = LocalDateTime.now().minusDays(365);
-            timeTo = LocalDateTime.now();
+
+        if (timeFromStr.isEmpty()) {
+            timeFrom = LocalDateTime.of(2000, 1, 1, 1, 1);
         } else {
             timeFrom = LocalDate.parse(timeFromStr).atStartOfDay();
-            timeTo = LocalDate.parse(timeToStr).atStartOfDay();
         }
 
-        appServ.generateChart(app, timeFrom, timeTo);
+        if (timeFromStr.isEmpty()) {
+            timeTo = LocalDateTime.now();
+        } else {
+            timeTo = LocalDate.parse(timeToStr).atTime(LocalTime.MAX);
+        }
+
+        if (timeFrom.isAfter(timeTo)) {
+            model.addAttribute("timeError", "неверный порядок дат");
+        } else {
+            appServ.prepareDetailApplicationView(app, timeFrom, timeTo);
+        }
+
         model.addAttribute("app", app);
-        model.addAttribute("timeFrom", timeFrom);
-        model.addAttribute("timeTo", timeTo);
+        model.addAttribute("timeFrom", timeFromStr);
+        model.addAttribute("timeTo", timeToStr);
 
         return "/user/applicationDetail";
     }
