@@ -27,11 +27,14 @@ public class Event {
     @Column(name = "dt_creation")
     private LocalDateTime dtCreation;
 
-    public Event(String name, String description, Application application, LocalDateTime dtCreation) {
-        this.name = name;
-        this.description = description;
-        this.application = application;
-        this.dtCreation = dtCreation;
+    public String[] getEventLikeArrayString() {
+        return new String[]{
+                Long.toString(id),
+                name,
+                description,
+                application.getName(),
+                dtCreation.toString()
+        };
     }
 
 }
