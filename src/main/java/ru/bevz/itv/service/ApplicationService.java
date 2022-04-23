@@ -1,5 +1,6 @@
 package ru.bevz.itv.service;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -8,15 +9,18 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.bevz.itv.domain.Application;
+import ru.bevz.itv.domain.Event;
 import ru.bevz.itv.domain.User;
 import ru.bevz.itv.repository.ApplicationRepo;
 import ru.bevz.itv.repository.EventRepo;
+import ru.homyakin.iuliia.Translator;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationService {
@@ -25,13 +29,18 @@ public class ApplicationService {
 
     private final EventRepo eventRepo;
 
-    @Value("${path.upload.img}")
+    private final Translator translator;
+
+    @Value("${download.path.img}")
     private String pathImg;
 
+    @Value("${download.path.csv}")
+    private String pathCsv;
 
-    public ApplicationService(ApplicationRepo appRepo, EventRepo eventRepo) {
+    public ApplicationService(ApplicationRepo appRepo, EventRepo eventRepo, Translator translator) {
         this.appRepo = appRepo;
         this.eventRepo = eventRepo;
+        this.translator = translator;
     }
 
     public Application addApplicationForUser(Application app, User user) {
@@ -62,41 +71,78 @@ public class ApplicationService {
         return appRepo.getApplicationsByUserAndNameIsNotNullOrderByDtCreation(user);
     }
 
-    public void generateChart(Application app, LocalDateTime from, LocalDateTime to) {
-        if (app.getChart() != null) {
-            File fileChart = new File(pathImg + "/" + app.getChart());
-            if (fileChart.exists()) {
-                if (fileChart.delete()) {
-                    app.setChart(null);
-                }
-            }
-        }
-        String eventRequest = "Запросы по событиям";
-        List<Object[]> dataForChart =
-                eventRepo.findByAppIdAndDtCreationBetweenCountGroupByName(app.getId(), from, to);
-        var categoryDataset = new DefaultCategoryDataset();
-        dataForChart.forEach((o) -> categoryDataset.setValue((Number) o[1], eventRequest, (String) o[0]));
+    public void prepareDetailApplicationView(Application app, LocalDateTime from, LocalDateTime to) {
+        LocalDateTime dateTimeGenerating = LocalDateTime.now().withNano(0);
 
-        // TODO: to set properties for the best view
+        if (app.getFilenameCsv() != null && app.getFilenameChart() != null) {
+            new File(pathCsv, app.getFilenameCsv()).delete();
+            new File(pathImg, app.getFilenameChart()).delete();
+        }
+
+        app.setFilenameCsv("%s-data-app-%s-from-%s-to-%s.csv".formatted(
+                dateTimeGenerating,
+                translator.translate(app.getName()),
+                from.toLocalDate(),
+                to.toLocalDate()
+        ).replace(':', '-').replace(' ', '-'));
+        app.setFilenameChart("%s-chart-app-%s-from-%s-to-%s.png".formatted(
+                dateTimeGenerating,
+                translator.translate(app.getName()),
+                from.toLocalDate(),
+                to.toLocalDate()
+        ).replace(':', '-').replace(' ', '-'));
+
+        List<Event> events =
+                eventRepo.findEventsByApplicationAndDtCreationBetweenOrderByDtCreation(app, from, to);
+
+        generateCsv(app, events);
+        generateChart(app, events);
+
+        appRepo.save(app);
+    }
+
+    private void generateChart(Application app, List<Event> events) {
+        DefaultCategoryDataset categoryDataset = new DefaultCategoryDataset();
+        String eventRequest = "Запросы по событиям";
+
+        events.stream()
+                .collect(Collectors.groupingBy(Event::getName, Collectors.counting()))
+                .forEach((k, v) -> categoryDataset.setValue(v, eventRequest, k));
+
         JFreeChart chart = ChartFactory.createBarChart(
-                null,
+                app.getFilenameChart()
+                        .substring(0, app.getFilenameChart().lastIndexOf(".")),
                 "",
                 eventRequest,
                 categoryDataset,
                 PlotOrientation.VERTICAL,
                 false,
-                true,
-                true
+                false,
+                false
         );
 
-        String nameChart = UUID.randomUUID().toString() + ".png";
-        app.setChart(nameChart);
-
         try {
-            ChartUtils.saveChartAsPNG(new File(pathImg + "/" + app.getChart()), chart, 1200, 700);
+            ChartUtils.saveChartAsPNG(new File(pathImg, app.getFilenameChart()), chart, 1200, 700);
         } catch (IOException e) {
             app.setName(null);
-            throw new RuntimeException(e);
+            throw new RuntimeException("IMG" + e);
+        }
+    }
+
+    private void generateCsv(Application app, List<Event> events) {
+        List<String[]> stringEvents = events
+                .stream()
+                .map(Event::getEventLikeArrayString)
+                .toList();
+
+        try {
+            CSVWriter csvWriter =
+                    new CSVWriter(new FileWriter(new File(pathCsv, app.getFilenameCsv())));
+            csvWriter.writeAll(stringEvents);
+            csvWriter.close();
+        } catch (IOException e) {
+            app.setFilenameCsv(null);
+            throw new RuntimeException("CSV " + e);
         }
     }
 }
