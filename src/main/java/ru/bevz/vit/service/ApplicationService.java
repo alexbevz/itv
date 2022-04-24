@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,5 +145,19 @@ public class ApplicationService {
             app.setFilenameCsv(null);
             throw new RuntimeException("CSV " + e);
         }
+    }
+
+    public long getCountAppsByUser(User user) {
+        Optional<Long> countOptional = appRepo.countApplicationsByUserAndNameIsNotNull(user);
+
+        if (countOptional.isPresent()) {
+            return countOptional.get();
+        } else {
+            return 0;
+        }
+    }
+
+    public Application getAppById(long appId) {
+        return appRepo.findById(appId).orElse(null);
     }
 }
