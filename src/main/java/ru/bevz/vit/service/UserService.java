@@ -1,4 +1,4 @@
-package ru.bevz.itv.service;
+package ru.bevz.vit.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -6,9 +6,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.bevz.itv.domain.Role;
-import ru.bevz.itv.domain.User;
-import ru.bevz.itv.repository.UserRepo;
+import ru.bevz.vit.domain.Role;
+import ru.bevz.vit.domain.User;
+import ru.bevz.vit.repository.UserRepo;
 
 import javax.persistence.EntityExistsException;
 import java.util.*;

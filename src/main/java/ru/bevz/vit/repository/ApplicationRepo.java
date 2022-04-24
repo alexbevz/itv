@@ -1,8 +1,8 @@
-package ru.bevz.itv.repository;
+package ru.bevz.vit.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.bevz.itv.domain.Application;
-import ru.bevz.itv.domain.User;
+import ru.bevz.vit.domain.Application;
+import ru.bevz.vit.domain.User;
 
 import java.util.List;
 

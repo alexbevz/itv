@@ -1,4 +1,4 @@
-package ru.bevz.itv.config;
+package ru.bevz.vit.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package ru.bevz.itv.domain.dto;
+package ru.bevz.vit.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

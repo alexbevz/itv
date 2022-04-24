@@ -1,12 +1,12 @@
-package ru.bevz.itv.controller;
+package ru.bevz.vit.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.bevz.itv.domain.Application;
-import ru.bevz.itv.domain.User;
-import ru.bevz.itv.service.ApplicationService;
+import ru.bevz.vit.domain.Application;
+import ru.bevz.vit.domain.User;
+import ru.bevz.vit.service.ApplicationService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

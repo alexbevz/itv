@@ -1,8 +1,8 @@
-package ru.bevz.itv.service;
+package ru.bevz.vit.service;
 
 import org.springframework.stereotype.Service;
-import ru.bevz.itv.domain.Event;
-import ru.bevz.itv.repository.EventRepo;
+import ru.bevz.vit.domain.Event;
+import ru.bevz.vit.repository.EventRepo;
 
 import java.time.LocalDateTime;
 

@@ -1,11 +1,11 @@
-package ru.bevz.itv.controller;
+package ru.bevz.vit.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.client.RestTemplate;
-import ru.bevz.itv.domain.dto.CaptchaResponseDto;
+import ru.bevz.vit.domain.dto.CaptchaResponseDto;
 
 import java.util.Collections;
 import java.util.HashMap;

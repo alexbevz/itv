@@ -1,4 +1,4 @@
-package ru.bevz.itv.service;
+package ru.bevz.vit.service;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import org.jfree.chart.ChartFactory;
@@ -8,11 +8,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.bevz.itv.domain.Application;
-import ru.bevz.itv.domain.Event;
-import ru.bevz.itv.domain.User;
-import ru.bevz.itv.repository.ApplicationRepo;
-import ru.bevz.itv.repository.EventRepo;
+import ru.bevz.vit.domain.Application;
+import ru.bevz.vit.domain.Event;
+import ru.bevz.vit.domain.User;
+import ru.bevz.vit.repository.ApplicationRepo;
+import ru.bevz.vit.repository.EventRepo;
 import ru.homyakin.iuliia.Translator;
 
 import java.io.File;

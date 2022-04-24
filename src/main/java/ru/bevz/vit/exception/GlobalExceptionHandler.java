@@ -1,4 +1,4 @@
-package ru.bevz.itv.exception;
+package ru.bevz.vit.exception;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

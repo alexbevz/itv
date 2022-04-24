@@ -1,4 +1,4 @@
-package ru.bevz.itv.domain;
+package ru.bevz.vit.domain;
 
 import org.springframework.security.core.GrantedAuthority;
 
