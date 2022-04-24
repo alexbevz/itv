@@ -8,6 +8,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.File;
+
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
@@ -16,6 +18,9 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Value("${download.path.csv}")
     private String pathCsv;
+
+    @Value("${path.static}")
+    private String pathStatic;
 
     @Bean
     public RestTemplate getRestTemplate() {
@@ -28,12 +33,19 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/img/**")
-                .addResourceLocations("file:/" + pathImg + "/");
-        registry.addResourceHandler("/csv/**")
-                .addResourceLocations("file:/" + pathCsv + "/");
+        String file = "file:///";
+
         registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
+                .addResourceLocations(file + pathStatic + "/");
+        new File(pathStatic).mkdirs();
+
+        registry.addResourceHandler("/img/**")
+                .addResourceLocations(file + pathImg + "/");
+        new File(pathImg).mkdirs();
+
+        registry.addResourceHandler("/csv/**")
+                .addResourceLocations(file + pathCsv + "/");
+        new File(pathCsv).mkdirs();
     }
 
 }
