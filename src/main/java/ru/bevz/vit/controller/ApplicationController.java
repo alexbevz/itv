@@ -4,6 +4,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.bevz.vit.domain.Application;
 import ru.bevz.vit.domain.User;
 import ru.bevz.vit.service.ApplicationService;
@@ -46,28 +47,41 @@ public class ApplicationController {
     public String addApplication(
             @AuthenticationPrincipal User user,
             @RequestParam String name,
-            Model model
+            RedirectAttributes redirectAttributes
     ) {
 
         if (name == null || name.isEmpty()) {
-            model.addAttribute("nameError", "название приложения не может быть пустым");
-            return "/user/applicationAdd";
+            redirectAttributes.addFlashAttribute("nameError", "название приложения не может быть пустым");
+            return "redirect:/user/applications/add";
+        } else {
+            Application app = new Application();
+            app.setName(name);
+            appServ.addApplicationForUser(app, user);
+
+            return "redirect:/user/applications";
         }
 
-        Application app = new Application();
-        app.setName(name);
-        appServ.addApplicationForUser(app, user);
-
-        return "redirect:/user/applications";
     }
 
-    @GetMapping("/applications/{app}")
+    @GetMapping("/applications/{appId}")
     public String detailApplication(
-            @PathVariable Application app,
+            @AuthenticationPrincipal User user,
+            @PathVariable long appId,
             @RequestParam(value = "timeFrom", required = false, defaultValue = "") String timeFromStr,
             @RequestParam(value = "timeTo", required = false, defaultValue = "") String timeToStr,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
+
+        Application app = appServ.getAppById(appId);
+
+        if (app == null || app.getName() == null || !app.getUser().equals(user)) {
+            redirectAttributes.addFlashAttribute(
+                    "getAppError",
+                    "у вас нет приложения с уникальным индентификатором " + appId
+            );
+            return "redirect:/user/applications";
+        }
         LocalDateTime timeFrom;
         LocalDateTime timeTo;
 
