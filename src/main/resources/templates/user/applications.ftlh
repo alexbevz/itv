@@ -6,6 +6,12 @@
 
             <h1>Мои приложения</h1>
 
+            <#if getAppError??>
+                <div class="alert alert-danger">
+                    ${getAppError}
+                </div>
+            </#if>
+
             <ol class="list-group">
                 <#list apps as app>
                     <div class="mb-3 sb-3">
