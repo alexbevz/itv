@@ -5,7 +5,7 @@
             <input class="form-control ${usernameError???string('is-invalid', '')}"
                    name="username"
                    placeholder="Электронная почта"
-                   type="text"
+                   type="<#if isRegisterForm>email<#else>text</#if>"
                    value="<#if user??>${user.username}</#if>"/>
             <#if usernameError??>
                 <div class="invalid-feedback">
