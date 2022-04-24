@@ -14,6 +14,7 @@ public class GlobalExceptionHandler {
     ) {
 
         model.addAttribute("infoError", exception.getMessage());
+        exception.printStackTrace();
 
         return "error";
     }
