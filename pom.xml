@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>ru.bevz</groupId>
-    <artifactId>itv</artifactId>
+    <artifactId>vit</artifactId>
     <version>1.0-RELEASE</version>
     <name>VIT</name>
     <description>This project is the solution for olympiad Volga-IT</description>
@@ -31,6 +31,12 @@
         <maven.compiler.target>17</maven.compiler.target>
 
         <lombok.version>1.18.22</lombok.version>
+        <postgresql.version>42.3.3</postgresql.version>
+        <flyway.version>8.5.7</flyway.version>
+        <iuliia.version>1.8</iuliia.version>
+        <opencsv.version>2.3</opencsv.version>
+        <jfreechart.version>1.5.3</jfreechart.version>
+        <spring-session-jdbc.version>2.6.2</spring-session-jdbc.version>
     </properties>
 
     <dependencies>
@@ -67,29 +73,29 @@
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-jdbc</artifactId>
-            <version>2.6.2</version>
+            <version>${spring-session-jdbc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.5.3</version>
+            <version>${jfreechart.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>2.3</version>
+            <version>${opencsv.version}</version>
         </dependency>
         <dependency>
             <groupId>ru.homyakin</groupId>
             <artifactId>iuliia-java</artifactId>
-            <version>1.8</version>
+            <version>${iuliia.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.5.7</version>
+            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
