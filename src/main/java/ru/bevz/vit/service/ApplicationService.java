@@ -4,13 +4,13 @@ import au.com.bytecode.opencsv.CSVWriter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.bevz.vit.domain.Application;
 import ru.bevz.vit.domain.Event;
 import ru.bevz.vit.domain.User;
+import ru.bevz.vit.domain.dto.EventCountByWmy;
 import ru.bevz.vit.repository.ApplicationRepo;
 import ru.bevz.vit.repository.EventRepo;
 import ru.homyakin.iuliia.Translator;
@@ -19,8 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,24 +102,14 @@ public class ApplicationService {
     }
 
     private void generateChart(Application app, List<Event> events) {
-        DefaultCategoryDataset categoryDataset = new DefaultCategoryDataset();
-        String eventRequest = "Запросы по событиям";
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        String nameCategory = "Количество событий";
 
         events.stream()
                 .collect(Collectors.groupingBy(Event::getName, Collectors.counting()))
-                .forEach((k, v) -> categoryDataset.setValue(v, eventRequest, k));
+                .forEach((k, v) -> dataset.setValue(v, nameCategory, k));
 
-        JFreeChart chart = ChartFactory.createBarChart(
-                app.getFilenameChart()
-                        .substring(0, app.getFilenameChart().lastIndexOf(".")),
-                "",
-                eventRequest,
-                categoryDataset,
-                PlotOrientation.VERTICAL,
-                false,
-                false,
-                false
-        );
+        JFreeChart chart = ChartFactory.createBarChart("", "", nameCategory, dataset);
 
         try {
             ChartUtils.saveChartAsPNG(new File(pathImg, app.getFilenameChart()), chart, 1200, 700);
@@ -159,5 +148,30 @@ public class ApplicationService {
 
     public Application getAppById(long appId) {
         return appRepo.findById(appId).orElse(null);
+    }
+
+    public Map<String, Long> getDataForChart(Application app, LocalDateTime timeFrom, LocalDateTime timeTo) {
+        return eventRepo.findEventsByApplicationAndDtCreationBetweenOrderByDtCreation(app, timeFrom, timeTo)
+                .stream()
+                .collect(Collectors.groupingBy(Event::getName, Collectors.counting()));
+    }
+
+    public Set<EventCountByWmy> getDataForWmyChart(Application app) {
+        LocalDateTime dtNow = LocalDateTime.now();
+        Map<String, Long> week = getDataForChart(app, dtNow.minusWeeks(1), dtNow);
+        Map<String, Long> month = getDataForChart(app, dtNow.minusMonths(1), dtNow);
+        Map<String, Long> year = getDataForChart(app, dtNow.minusYears(1), dtNow);
+        Set<EventCountByWmy> eventCountByWmySet = new HashSet<>();
+        for (String key : year.keySet()) {
+            eventCountByWmySet.add(
+                    new EventCountByWmy(
+                            key,
+                            week.getOrDefault(key, 0L),
+                            month.getOrDefault(key, 0L),
+                            year.getOrDefault(key, 0L)
+                    )
+            );
+        }
+        return eventCountByWmySet;
     }
 }
