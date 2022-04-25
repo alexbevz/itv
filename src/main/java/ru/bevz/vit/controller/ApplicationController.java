@@ -12,6 +12,7 @@ import ru.bevz.vit.service.ApplicationService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Controller
 @RequestMapping("/user")
@@ -87,13 +88,15 @@ public class ApplicationController {
 
 
         if (timeFromStr.isEmpty()) {
-            timeFrom = LocalDateTime.of(2000, 1, 1, 1, 1);
+            timeFrom = LocalDateTime.now().minusYears(1);
+            timeFromStr = timeFrom.format(DateTimeFormatter.ISO_DATE);
         } else {
             timeFrom = LocalDate.parse(timeFromStr).atStartOfDay();
         }
 
-        if (timeFromStr.isEmpty()) {
+        if (timeToStr.isEmpty()) {
             timeTo = LocalDateTime.now();
+            timeToStr = timeTo.format(DateTimeFormatter.ISO_DATE);
         } else {
             timeTo = LocalDate.parse(timeToStr).atTime(LocalTime.MAX);
         }
@@ -102,8 +105,10 @@ public class ApplicationController {
             model.addAttribute("timeError", "неверный порядок дат");
         } else {
             appServ.prepareDetailApplicationView(app, timeFrom, timeTo);
+            model.addAttribute("customEvents", appServ.getDataForChart(app, timeFrom, timeTo).entrySet());
         }
 
+        model.addAttribute("wmyEvents", appServ.getDataForWmyChart(app));
         model.addAttribute("app", app);
         model.addAttribute("timeFrom", timeFromStr);
         model.addAttribute("timeTo", timeToStr);
