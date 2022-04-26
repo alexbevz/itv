@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
         User byUsername = userRepo.findByUsername(username);
 
         if (byUsername == null) {
-            throw new UsernameNotFoundException("User already exists");
+            throw new UsernameNotFoundException("user already exists");
         }
 
         return byUsername;
@@ -57,9 +57,8 @@ public class UserService implements UserDetailsService {
 
     private void sendMessage(User user) {
 
-        String message = "Hello, " + user.getUsername() + "! Your code activation: " + user.getActivationCode()
-                + "\n Or you may visit the next link: http://%s/activate/".formatted(hostname) + user.getActivationCode()
-                + "\n Thanks for attention!";
+        String message = "Здравствуйте!\n\rВаша ссылка активации: http://%s/activate/%s\n\rСпасибо за подтверждение почты!"
+                .formatted(hostname, user.getActivationCode());
         Thread thread = new Thread(() -> emailSenderService.send(user.getUsername(), "Activation code", message));
         thread.start();
 

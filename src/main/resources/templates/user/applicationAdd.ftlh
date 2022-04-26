@@ -6,7 +6,7 @@
             <h1>Форма добавления приложения</h1>
             <form action="/user/applications" method="post">
                 <div class="mb-3 sb-3">
-                    <label class="form-label">Уникальный индентификатор:</label>
+                    <label class="form-label">Уникальный идентификатор:</label>
                     <input class="form-control"
                            readonly="readonly"
                            value="${app.id}"/>

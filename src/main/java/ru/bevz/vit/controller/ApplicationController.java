@@ -79,7 +79,7 @@ public class ApplicationController {
         if (app == null || app.getName() == null || !app.getUser().equals(user)) {
             redirectAttributes.addFlashAttribute(
                     "getAppError",
-                    "у вас нет приложения с уникальным индентификатором " + appId
+                    "у вас нет приложения с уникальным идентификатором " + appId
             );
             return "redirect:/user/applications";
         }

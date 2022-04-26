@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <h1>Страница для отправления событий</h1>
-            <q>Добавленно специально для тестирования</q>
+            <q>Добавлено специально для тестирования</q>
             <h2>Форма для создания и отправки события</h2>
             <form method="post">
                 <div class="mb-3 sb-3">
@@ -22,7 +22,7 @@
                            type="text"/>
                 </div>
                 <div class="mb-3 sb-3">
-                    <label class="form-label">Уникальный индентификатор приложения:</label>
+                    <label class="form-label">Уникальный идентификатор приложения:</label>
                     <input class="form-control"
                            name="application"
                            placeholder="Уникальный индентификатор приложения"
