@@ -53,7 +53,7 @@
     <div class="row">
         <div class="col">
             <h2>Приложение: ${app.name}</h2>
-            <h3>Уникальный индентификатор: ${app.id}</h3>
+            <h3>Уникальный идентификатор: ${app.id}</h3>
 
             <div class="row flex-nowrap">
                 <div class="col-9">
@@ -88,15 +88,25 @@
                     </div>
                     <div class="carousel-inner" style="height: 700px;">
                         <div class="carousel-item active">
-                            <div id="wmyChart"></div>
-                        </div>
-                        <div class="carousel-item">
-                            <#if !timeError??>
-                                <img src="/img/${app.filenameChart}" alt="${app.filenameChart}"/>
+                            <#if wmyEvents?has_content>
+                                <div id="wmyChart"></div>
+                            <#else>
+                                <strong>Диаграмму не получилось построить, так как нет данных!</strong>
                             </#if>
                         </div>
                         <div class="carousel-item">
-                            <div id="pieChart"></div>
+                            <#if !timeError?? && customEvents?has_content>
+                                <img src="/img/${app.filenameChart}" alt="${app.filenameChart}"/>
+                            <#else>
+                                <strong>Диаграмму не получилось построить, так как нет данных!</strong>
+                            </#if>
+                        </div>
+                        <div class="carousel-item">
+                            <#if !timeError?? && customEvents?has_content>
+                                <div id="pieChart"></div>
+                            <#else>
+                                <strong>Диаграмму не получилось построить, так как нет данных!</strong>
+                            </#if>
                         </div>
                     </div>
                     <button class="carousel-control-prev" style="left: -150px;" type="button"
