@@ -16,7 +16,7 @@
                 <#list apps as app>
                     <div class="mb-3 sb-3">
                         <li class="list-group-item ">
-                            <a href="/user/applications/${app.id}">
+                            <a href="/user/applications/${app.id?c}">
                                 Приложение ${app.name}
                             </a>
                         </li>
