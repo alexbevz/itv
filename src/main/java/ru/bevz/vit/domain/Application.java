@@ -35,6 +35,10 @@ public class Application {
     @Column(name = "csv")
     private String filenameCsv;
 
+    public Application(long id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
