@@ -31,7 +31,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/registration",
                         "/activate/*",
                         "/static/**",
-                        "/error"
+                        "/error",
+                        "/api/events"
                     ).permitAll()
                     .anyRequest().authenticated()
                 .and()
@@ -42,7 +43,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .rememberMe()
                 .and()
                     .logout()
-                    .permitAll();
+                    .permitAll()
+                .and()
+                    .csrf()
+                    .ignoringAntMatchers("/api/events");
     }
 
     @Override
