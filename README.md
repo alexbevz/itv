@@ -29,6 +29,24 @@ ____
 
 Расширен перечень диаграмм.
 
+Добавлен Rest API контроллер для добавления событий:
+```json
+POST:/api/events
+[
+    {
+        "name": "some name event",
+        "application_id": 1000,
+        "description": "some description"
+    },
+    {
+        "name": "some name event",
+        "application_id": 1000,
+        "description": "some description"
+    }
+]
+```
+
+
 ## Дополнительные библиотеки при разработке
 
 Spring Boot Modules
@@ -53,6 +71,8 @@ iuliia-java - транслитерация с русского на англий
 opencsv - работа с csv-файлами.
 
 ## Развертывание приложения
+
+Данная инструкция по развертыванию приложения учитывает, что инструменты `git` и `docker` установлены.
 
 - Шаг 0.
 Открываем терминал. 
