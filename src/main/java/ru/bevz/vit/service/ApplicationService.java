@@ -174,4 +174,8 @@ public class ApplicationService {
         }
         return eventCountByWmySet;
     }
+
+    public boolean existsAppById(long id) {
+        return appRepo.existsById(id);
+    }
 }
