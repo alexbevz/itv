@@ -98,7 +98,7 @@ cd vit
 - Шаг 4.
 Теперь осталось развернуть приложение при помощи инструмента `docker`:
 ```shell
-docker compose up 
+docker-compose up 
 ```
 
 - Шаг 5.
