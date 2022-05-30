@@ -32,7 +32,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/activate/*",
                         "/static/**",
                         "/error",
-                        "/api/events"
+                        "/api/events",
+                        "/event"
                     ).permitAll()
                     .anyRequest().authenticated()
                 .and()

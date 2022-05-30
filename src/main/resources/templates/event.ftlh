@@ -9,7 +9,7 @@
             <#if success??>
                 <div class="alert alert-success">${success}</div>
             </#if>
-            <form method="post">
+            <form method="post" action="/event">
                 <div class="mb-3 sb-3">
                     <label class="form-label">Название события:</label>
                     <input class="form-control <#if nameError??>is-invalid</#if>"

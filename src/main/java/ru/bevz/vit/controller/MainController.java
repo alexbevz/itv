@@ -1,5 +1,6 @@
 package ru.bevz.vit.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -40,15 +41,40 @@ public class MainController {
         return "index";
     }
 
-    @GetMapping("/event")
+    @GetMapping("/addEvent")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String getEventView() {
+    public String addEvent() {
         return "event";
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/event")
+    public ResponseEntity<Object> getEventView(
+            @RequestParam String appId,
+            @RequestParam String name,
+            @RequestParam String description
+    ) {
+
+        if (
+                !Pattern.matches("^[1-9]\\d*$", appId) ||
+                        !appServ.existsAppById(Long.parseLong(appId)) ||
+                        name.isBlank() ||
+                        description.isBlank()
+        ) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        eventServ.addEvent(new Event(name, description, new Application(Long.parseLong(appId))));
+
+        return ResponseEntity.accepted().build();
+    }
+
     @PostMapping("/event")
-    public String addEvent(@RequestParam String appId, @Valid Event event, BindingResult bindingResult, Model model) {
+    public String addEvent(
+            @RequestParam String appId,
+            @Valid Event event,
+            BindingResult bindingResult,
+            Model model
+    ) {
 
         if (!Pattern.matches("^[1-9]\\d*$", appId)) {
             bindingResult.rejectValue("application", "applicationError", "идентификатор должен быть положительным целым числом");

@@ -28,7 +28,7 @@
                 </#if>
                 <#if isAdmin>
                     <li class="nav-item">
-                        <a class="nav-link" href="/event">Добавить событие</a>
+                        <a class="nav-link" href="/addEvent">Добавить событие</a>
                     </li>
                 </#if>
             </ul>
